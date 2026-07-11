@@ -56,6 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+<video autoplay muted loop playsinline id="bg-video">
+  <source src="assets/videos/bg.mp4" type="video/mp4">
+</video>
 <div class="login-wrap">
   <div class="login-card">
     <h1>Workshop<span style="color:#329f9f">X</span></h1>
