@@ -44,7 +44,7 @@ foreach ($dbCustomers as $c) {
             'id' => $c['id'],
             'name' => $c['name'],
             'phone' => $c['phone'],
-            'email' => $c['email'],
+            'email' => $c['email'] ?? '-',
             'created_at' => $c['created_at'] ?? null,
         ];
     }

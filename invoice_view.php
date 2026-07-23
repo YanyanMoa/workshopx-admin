@@ -2,7 +2,8 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/Supabase.php';
-require_login();
+// Allow staff to view/print invoices from the mobile app without admin login
+// require_login();
 
 $token = current_token();
 $error = '';
@@ -183,7 +184,7 @@ include __DIR__ . '/partials/header.php';
   body {
     background: #fff !important;
   }
-  .sidebar, .topbar, .invoice-actions-bar {
+  .sidebar, .topbar, .invoice-actions-bar, .inspection-details-card {
     display: none !important;
   }
   .app-shell, .main, .content {
@@ -267,7 +268,6 @@ include __DIR__ . '/partials/header.php';
         <h4>Invoice To</h4>
         <p><strong><?= htmlspecialchars($custName) ?></strong></p>
         <p>Phone: <?= htmlspecialchars($custPhone) ?></p>
-        <p>Email: <?= htmlspecialchars($custEmail) ?></p>
       </div>
       <div class="meta-col">
         <h4>Vehicle Info</h4>
@@ -341,6 +341,37 @@ include __DIR__ . '/partials/header.php';
       </table>
     </div>
   </div>
+
+  <?php if (!empty($order['photo_url']) || !empty($order['inspection_notes']) || isset($order['inspection_done'])): ?>
+    <div class="inspection-details-card" style="background:#fff; border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow); padding:30px; max-width:800px; margin:20px auto 30px auto; color:#1a2b2b;">
+      <h3 style="margin-top:0; color:var(--teal-dark); border-bottom: 2px solid #f4f7f7; padding-bottom: 12px; font-weight:700;">🔍 Vehicle Inspection & Service Record</h3>
+      <div style="display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap;">
+        <?php if (!empty($order['photo_url'])): ?>
+          <div style="flex:1; min-width:250px;">
+            <h4 style="margin:0 0 8px 0; color:var(--text-muted); font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Vehicle Photo</h4>
+            <a href="<?= htmlspecialchars($order['photo_url']) ?>" target="_blank">
+              <img src="<?= htmlspecialchars($order['photo_url']) ?>" alt="Vehicle Photo" style="width:100%; max-width:320px; border-radius:8px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); cursor:pointer;">
+            </a>
+          </div>
+        <?php endif; ?>
+        <div style="flex:2; min-width:280px;">
+          <h4 style="margin:0 0 8px 0; color:var(--text-muted); font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Inspection Notes</h4>
+          <p style="margin:0 0 20px 0; font-size:14px; line-height:1.6; color:#2c3e50; font-style:italic; background:#f8fafc; padding:15px; border-radius:8px; border-left:4px solid var(--teal);">
+            "<?= htmlspecialchars($order['inspection_notes'] ?: 'No inspection notes recorded.') ?>"
+          </p>
+          
+          <h4 style="margin:0 0 8px 0; color:var(--text-muted); font-size:11px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Checklist Status</h4>
+          <div style="font-size:14px; display:flex; align-items:center; gap:8px;">
+            <?php if (!empty($order['inspection_done'])): ?>
+              <span style="color:#1f7a4d; font-weight:700; background:#e2f7ec; padding:4px 8px; border-radius:6px; font-size:12px;">✅ COMPLETED</span>
+            <?php else: ?>
+              <span style="color:#b25e00; font-weight:700; background:#fff3cd; padding:4px 8px; border-radius:6px; font-size:12px;">⏳ PENDING / NOT DONE</span>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
 
   <div class="invoice-actions-bar">
     <a href="invoices.php" class="btn btn-outline">&larr; Back to Invoices</a>

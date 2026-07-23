@@ -51,7 +51,7 @@ try {
 
     // Embed vehicle -> customer via Supabase's FK-based nested select
     $recentOrders = Supabase::select(TBL_SERVICE_ORDERS, [
-        'select' => '*,vehicles(plate_no,make,model,customer_name,customers(name))',
+        'select' => '*,vehicles(plate_no,make,model,customers(name))',
         'order' => 'created_at.desc',
         'limit' => '6',
     ], $token);

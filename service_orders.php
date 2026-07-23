@@ -19,9 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 try {
     $orders = Supabase::select(TBL_SERVICE_ORDERS, [
-        'select' => '*,vehicles(plate_no,make,model,customer_name,customers(name))',
+        'select' => '*,vehicles(plate_no,make,model,customers(name))',
         'order' => 'created_at.desc',
     ], $token);
+
+    $mechanicsMap = [];
+    try {
+        $profilesList = Supabase::select(TBL_PROFILES, [], $token);
+        foreach ($profilesList as $p) {
+            $mechanicsMap[$p['id']] = $p['full_name'];
+        }
+    } catch (Exception $ex) {
+        // Fallback silently if profiles load fails
+    }
 } catch (Exception $e) {
     $orders = [];
     $error = $error ?: $e->getMessage();
@@ -56,7 +66,7 @@ include __DIR__ . '/partials/header.php';
         <tr>
           <td>#<?= htmlspecialchars(substr($o['id'] ?? '', 0, 8)) ?></td>
           <td><?= htmlspecialchars($vehicleLabel) ?><?= $customerName ? ' (' . htmlspecialchars($customerName) . ')' : '' ?></td>
-          <td><?= htmlspecialchars(substr($o['mechanic_id'] ?? '-', 0, 8)) ?></td>
+          <td><?= htmlspecialchars($mechanicsMap[$o['mechanic_id'] ?? ''] ?? (!empty($o['mechanic_id']) ? substr($o['mechanic_id'], 0, 8) : '-')) ?></td>
           <td><?= htmlspecialchars(isset($o['created_at']) ? date('d M Y', strtotime($o['created_at'])) : '-') ?></td>
           <td>
             <form method="POST" action="service_orders.php" style="display:flex; gap:6px;">

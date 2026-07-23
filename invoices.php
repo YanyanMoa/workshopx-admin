@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'mark_
 try {
     // Select all service orders that are Completed or Paid
     $orders = Supabase::select(TBL_SERVICE_ORDERS, [
-        'select' => '*,vehicles(plate_no,make,model,customer_name,customers(name))',
+        'select' => '*,vehicles(plate_no,make,model,customers(name))',
         'status' => 'in.(Completed,completed,Paid,paid)',
         'order' => 'created_at.desc'
     ], $token);
