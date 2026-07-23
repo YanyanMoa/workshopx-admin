@@ -9,15 +9,27 @@ $notice = '';
 $error = '';
 $tableMissing = false;
 
-// Handle Add Survey form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_survey') {
+// Handle Survey form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
-        Supabase::insert(TBL_SURVEYS, [
-            'equipment_name' => trim($_POST['equipment_name']),
-            'condition'      => trim($_POST['condition']),
-            'surveyed_by'    => trim($_POST['surveyed_by']),
-        ], $token);
-        $notice = 'Equipment survey recorded successfully.';
+        if ($_POST['action'] === 'add_survey') {
+            Supabase::insert(TBL_SURVEYS, [
+                'equipment_name' => trim($_POST['equipment_name']),
+                'condition'      => trim($_POST['condition']),
+                'surveyed_by'    => trim($_POST['surveyed_by']),
+            ], $token);
+            $notice = 'Equipment survey recorded successfully.';
+        } elseif ($_POST['action'] === 'delete_survey') {
+            Supabase::delete(TBL_SURVEYS, [
+                'id' => 'eq.' . $_POST['survey_id']
+            ], $token);
+            $notice = 'Equipment survey deleted successfully.';
+        } elseif ($_POST['action'] === 'update_condition') {
+            Supabase::update(TBL_SURVEYS, [
+                'condition' => $_POST['condition']
+            ], ['id' => 'eq.' . $_POST['survey_id']], $token);
+            $notice = 'Equipment condition updated successfully.';
+        }
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -66,11 +78,12 @@ include __DIR__ . '/partials/header.php';
         <th>Condition</th>
         <th>Surveyed By</th>
         <th>Date</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <?php if (empty($surveys)): ?>
-        <tr><td colspan="4" class="empty-state">No equipment surveys recorded yet.</td></tr>
+        <tr><td colspan="5" class="empty-state">No equipment surveys recorded yet.</td></tr>
       <?php else: foreach ($surveys as $s): ?>
         <tr>
           <td><?= htmlspecialchars($s['equipment_name'] ?? '-') ?></td>
@@ -91,6 +104,31 @@ include __DIR__ . '/partials/header.php';
           </td>
           <td><?= htmlspecialchars($s['surveyed_by'] ?? '-') ?></td>
           <td><?= htmlspecialchars(isset($s['created_at']) ? date('d M Y', strtotime($s['created_at'])) : '-') ?></td>
+          <td>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <!-- Edit/Update Form -->
+              <form method="POST" action="surveys.php" style="display:flex; gap:4px; margin:0;">
+                <input type="hidden" name="action" value="update_condition">
+                <input type="hidden" name="survey_id" value="<?= htmlspecialchars($s['id'] ?? '') ?>">
+                <select name="condition" style="padding:4px 6px; border-radius:6px; border:1px solid #e1e8e8; font-size:12px; background:white;">
+                  <?php
+                    $conditions = ['Excellent', 'Good', 'Fair', 'Needs Repair', 'Out of Service'];
+                    foreach ($conditions as $cOpt):
+                  ?>
+                    <option value="<?= $cOpt ?>" <?= ($s['condition'] ?? '') === $cOpt ? 'selected' : '' ?>><?= htmlspecialchars($cOpt) ?></option>
+                  <?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;">Save</button>
+              </form>
+
+              <!-- Delete Form -->
+              <form method="POST" action="surveys.php" style="margin:0;" onsubmit="return confirm('Are you sure you want to delete this survey?');">
+                <input type="hidden" name="action" value="delete_survey">
+                <input type="hidden" name="survey_id" value="<?= htmlspecialchars($s['id'] ?? '') ?>">
+                <button type="submit" style="padding:4px 10px; font-size:11px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; cursor:pointer; font-weight:600;">Delete</button>
+              </form>
+            </div>
+          </td>
         </tr>
       <?php endforeach; endif; ?>
     </tbody>
