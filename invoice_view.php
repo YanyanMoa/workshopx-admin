@@ -18,7 +18,7 @@ if (empty($_GET['id'])) {
 try {
     // Select the service order with vehicle & customer info
     $results = Supabase::select(TBL_SERVICE_ORDERS, [
-        'select' => '*,vehicles(plate_no,make,model,customers(name,phone,email))',
+        'select' => '*,vehicles(plate_no,make,model,customers(name,phone))',
         'id' => 'eq.' . $_GET['id']
     ], $token);
 
