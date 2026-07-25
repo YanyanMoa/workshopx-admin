@@ -8,20 +8,6 @@ $token = current_token();
 $notice = '';
 $error = '';
 
-// Handle Add Customer form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_customer') {
-    try {
-        Supabase::insert(TBL_CUSTOMERS, [
-            'name'  => trim($_POST['name']),
-            'phone' => trim($_POST['phone']),
-            'email' => '-',
-            'address' => '-',
-        ], $token);
-        $notice = 'Customer added successfully.';
-    } catch (Exception $e) {
-        $error = $e->getMessage();
-    }
-}
 
 try {
     $dbCustomers = Supabase::select(TBL_CUSTOMERS, ['select' => '*', 'order' => 'created_at.desc'], $token);
@@ -86,7 +72,6 @@ include __DIR__ . '/partials/header.php';
 <div class="table-card">
   <div class="table-toolbar">
     <input type="text" id="searchCustomers" placeholder="🔍 Search by name, phone, or email...">
-    <button class="btn btn-primary" onclick="openModal('addCustomerModal')">+ Add Customer</button>
   </div>
   <table class="data-table" id="customersTable">
     <thead>
@@ -107,21 +92,6 @@ include __DIR__ . '/partials/header.php';
   </table>
 </div>
 
-<!-- Add Customer Modal -->
-<div class="modal-overlay" id="addCustomerModal">
-  <div class="modal-box">
-    <h3>Add New Customer</h3>
-    <form method="POST" action="customers.php">
-      <input type="hidden" name="action" value="add_customer">
-      <div class="form-group"><label>Full Name</label><input type="text" name="name" required></div>
-      <div class="form-group"><label>Phone Number</label><input type="text" name="phone" required></div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal('addCustomerModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Customer</button>
-      </div>
-    </form>
-  </div>
-</div>
 
 <script>filterTable('searchCustomers', 'customersTable');</script>
 <?php include __DIR__ . '/partials/footer.php'; ?>
