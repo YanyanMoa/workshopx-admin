@@ -17,6 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_order') {
+    try {
+        Supabase::delete(TBL_SERVICE_ORDERS, ['id' => 'eq.' . $_POST['order_id']], $token);
+        $notice = 'Service order deleted successfully.';
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+}
+
 try {
     $orders = Supabase::select(TBL_SERVICE_ORDERS, [
         'select' => '*,vehicles(plate_no,make,model,customers(name))',
@@ -53,7 +62,7 @@ include __DIR__ . '/partials/header.php';
   </div>
   <table class="data-table" id="ordersTable">
     <thead>
-      <tr><th>Order ID</th><th>Vehicle</th><th>Assigned Mechanic</th><th>Created</th><th>Status</th></tr>
+      <tr><th>Order ID</th><th>Vehicle</th><th>Assigned Mechanic</th><th>Created</th><th>Status</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php if (empty($orders)): ?>
@@ -78,6 +87,13 @@ include __DIR__ . '/partials/header.php';
                 <?php endforeach; ?>
               </select>
               <button type="submit" class="btn btn-outline btn-sm">Update</button>
+            </form>
+          </td>
+          <td>
+            <form method="POST" action="service_orders.php" onsubmit="return confirm('Delete order #<?= htmlspecialchars(substr($o['id'] ?? '', 0, 8)) ?>? This cannot be undone.');">
+              <input type="hidden" name="action" value="delete_order">
+              <input type="hidden" name="order_id" value="<?= htmlspecialchars($o['id'] ?? '') ?>">
+              <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
             </form>
           </td>
         </tr>
