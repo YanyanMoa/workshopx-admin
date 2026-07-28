@@ -17,6 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_user') {
+    try {
+        Supabase::delete(TBL_PROFILES, ['id' => 'eq.' . $_POST['user_id']], $token);
+        $notice = 'User deleted successfully.';
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+}
+
 try {
     $users = Supabase::select(TBL_PROFILES, ['select' => '*', 'order' => 'created_at.desc'], $token);
 } catch (Exception $e) {
@@ -43,14 +52,13 @@ include __DIR__ . '/partials/header.php';
 <div class="table-card">
   <div class="table-toolbar"><input type="text" id="searchUsers" placeholder="🔍 Search users..."></div>
   <table class="data-table" id="usersTable">
-    <thead><tr><th>Full Name</th><th>Phone</th><th>Current Role</th><th>Change Role</th></tr></thead>
+    <thead><tr><th>Full Name</th><th>Current Role</th><th>Change Role</th><th>Actions</th></tr></thead>
     <tbody>
       <?php if (empty($users)): ?>
         <tr><td colspan="4" class="empty-state">No users found.</td></tr>
       <?php else: foreach ($users as $u): ?>
         <tr>
           <td><?= htmlspecialchars($u['full_name'] ?? '-') ?></td>
-          <td><?= htmlspecialchars($u['phone'] ?? '-') ?></td>
           <td><span class="badge badge-progress"><?= htmlspecialchars(ucfirst($u['role'] ?? 'staff')) ?></span></td>
           <td>
             <form method="POST" action="users.php" style="display:flex; gap:6px;">
@@ -62,6 +70,13 @@ include __DIR__ . '/partials/header.php';
                 <?php endforeach; ?>
               </select>
               <button type="submit" class="btn btn-outline btn-sm">Save</button>
+            </form>
+          </td>
+          <td>
+            <form method="POST" action="users.php" onsubmit="return confirm('Delete user &quot;<?= htmlspecialchars(addslashes($u['full_name'] ?? '')) ?>&quot;? This cannot be undone.');">
+              <input type="hidden" name="action" value="delete_user">
+              <input type="hidden" name="user_id" value="<?= htmlspecialchars($u['id'] ?? '') ?>">
+              <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
             </form>
           </td>
         </tr>
