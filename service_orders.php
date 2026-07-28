@@ -78,7 +78,7 @@ include __DIR__ . '/partials/header.php';
           <td><?= htmlspecialchars($mechanicsMap[$o['mechanic_id'] ?? ''] ?? (!empty($o['mechanic_id']) ? substr($o['mechanic_id'], 0, 8) : '-')) ?></td>
           <td><?= htmlspecialchars(isset($o['created_at']) ? date('d M Y', strtotime($o['created_at'])) : '-') ?></td>
           <td>
-            <form method="POST" action="service_orders.php" style="display:flex; gap:6px;">
+            <form method="POST" action="service_orders.php" id="form-status-<?= htmlspecialchars($o['id'] ?? '') ?>" style="display:flex; gap:6px;">
               <input type="hidden" name="action" value="update_status">
               <input type="hidden" name="order_id" value="<?= htmlspecialchars($o['id'] ?? '') ?>">
               <select name="status" style="padding:6px;border-radius:6px;border:1px solid #e1e8e8;">
@@ -86,15 +86,17 @@ include __DIR__ . '/partials/header.php';
                   <option value="<?= $s ?>" <?= strtolower($o['status'] ?? '') === strtolower($s) ? 'selected' : '' ?>><?= htmlspecialchars($s) ?></option>
                 <?php endforeach; ?>
               </select>
-              <button type="submit" class="btn btn-outline btn-sm">Update</button>
             </form>
           </td>
           <td>
-            <form method="POST" action="service_orders.php" onsubmit="return confirm('Delete order #<?= htmlspecialchars(substr($o['id'] ?? '', 0, 8)) ?>? This cannot be undone.');">
-              <input type="hidden" name="action" value="delete_order">
-              <input type="hidden" name="order_id" value="<?= htmlspecialchars($o['id'] ?? '') ?>">
-              <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
-            </form>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="submit" form="form-status-<?= htmlspecialchars($o['id'] ?? '') ?>" class="btn btn-outline btn-sm">Update</button>
+              <form method="POST" action="service_orders.php" onsubmit="return confirm('Delete order #<?= htmlspecialchars(substr($o['id'] ?? '', 0, 8)) ?>? This cannot be undone.');" style="margin:0;">
+                <input type="hidden" name="action" value="delete_order">
+                <input type="hidden" name="order_id" value="<?= htmlspecialchars($o['id'] ?? '') ?>">
+                <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
+              </form>
+            </div>
           </td>
         </tr>
       <?php endforeach; endif; ?>
