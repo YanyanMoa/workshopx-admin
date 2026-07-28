@@ -339,28 +339,6 @@ include __DIR__ . '/partials/header.php';
   <?php endif; ?>
 </div>
 
-<!-- ── Low Stock Alert ── -->
-<div class="report-table-card">
-  <h3>⚠️ Low Stock Inventory Alert <span style="font-size:12px;color:#b91c1c;">(Stock &lt; 5)</span></h3>
-  <?php if (empty($lowStockParts)): ?>
-    <p style="color:#16a34a;font-size:13px;">✅ All parts are sufficiently stocked.</p>
-  <?php else: ?>
-  <table>
-    <thead><tr><th>Part Name</th><th>Part Code (SKU)</th><th>Current Stock</th><th>Status</th></tr></thead>
-    <tbody>
-      <?php foreach ($lowStockParts as $p): ?>
-      <tr>
-        <td><?= htmlspecialchars($p['name'] ?? '-') ?></td>
-        <td><?= htmlspecialchars($p['sku'] ?? '-') ?></td>
-        <td><?= (int)($p['stock'] ?? 0) ?></td>
-        <td><span class="badge badge-low">Low Stock</span></td>
-      </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-  <?php endif; ?>
-</div>
-
 <!-- ── Chart.js Scripts ── -->
 <script>
 <?php if (!empty($revenueByPeriod)): ?>
