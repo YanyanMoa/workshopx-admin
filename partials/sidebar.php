@@ -16,6 +16,7 @@ $__role = current_role();
     <a href="inventory.php" class="<?= nav_active('inventory.php', $__current) ?>">📦 Inventory</a>
     <a href="invoices.php" class="<?= nav_active('invoices.php', $__current) ?>">🧾 Invoices &amp; Payments</a>
     <a href="surveys.php" class="<?= nav_active('surveys.php', $__current) ?>">📋 Equipment Surveys</a>
+    <a href="reports.php" class="<?= nav_active('reports.php', $__current) ?>">📈 Reports & Analytics</a>
     <?php if ($__role === 'admin'): ?>
     <a href="users.php" class="<?= nav_active('users.php', $__current) ?>">🧑‍🤝‍🧑 User &amp; Role Management</a>
     <?php endif; ?>
