@@ -66,19 +66,21 @@ include __DIR__ . '/partials/header.php';
           <td>RM <?= number_format((float)($p['price'] ?? 0), 2) ?></td>
           <td><span class="badge badge-<?= $low ? 'low' : 'ok' ?>"><?= $low ? 'Low Stock' : 'In Stock' ?></span></td>
           <td>
-            <form method="POST" action="inventory.php" style="display:flex; gap:6px;">
+            <form method="POST" action="inventory.php" id="form-adjust-<?= htmlspecialchars($p['id'] ?? '') ?>" style="display:flex; gap:6px; margin:0;">
               <input type="hidden" name="action" value="adjust_qty">
               <input type="hidden" name="part_id" value="<?= htmlspecialchars($p['id'] ?? '') ?>">
               <input type="number" name="quantity" value="<?= $qty ?>" style="width:70px;padding:6px;border-radius:6px;border:1px solid #e1e8e8;">
-              <button type="submit" class="btn btn-outline btn-sm">Save</button>
             </form>
           </td>
           <td>
-            <form method="POST" action="inventory.php" onsubmit="return confirm('Delete &quot;<?= htmlspecialchars(addslashes($p['name'] ?? '')) ?>&quot;? This cannot be undone.');">
-              <input type="hidden" name="action" value="delete_part">
-              <input type="hidden" name="part_id" value="<?= htmlspecialchars($p['id'] ?? '') ?>">
-              <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
-            </form>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="submit" form="form-adjust-<?= htmlspecialchars($p['id'] ?? '') ?>" class="btn btn-outline btn-sm">Save</button>
+              <form method="POST" action="inventory.php" onsubmit="return confirm('Delete &quot;<?= htmlspecialchars(addslashes($p['name'] ?? '')) ?>&quot;? This cannot be undone.');" style="margin:0;">
+                <input type="hidden" name="action" value="delete_part">
+                <input type="hidden" name="part_id" value="<?= htmlspecialchars($p['id'] ?? '') ?>">
+                <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
+              </form>
+            </div>
           </td>
         </tr>
       <?php endforeach; endif; ?>
