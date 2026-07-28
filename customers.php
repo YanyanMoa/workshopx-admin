@@ -158,32 +158,32 @@ include __DIR__ . '/partials/header.php';
       </div>
 
       <hr style="margin:20px 0;border-color:#eee;">
-      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;">Vehicle Information <span style="font-size:11px;">(optional — leave Plate No blank to skip)</span></p>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;">Vehicle Information</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="form-group" style="margin:0;">
-          <label>Plate No</label>
-          <input type="text" name="plate_no" placeholder="e.g. WXY 1234" style="text-transform:uppercase;">
+          <label>Plate No <span style="color:red">*</span></label>
+          <input type="text" name="plate_no" required placeholder="e.g. WXY 1234" style="text-transform:uppercase;">
         </div>
         <div class="form-group" style="margin:0;">
-          <label>Make (Brand)</label>
-          <input type="text" name="make" placeholder="e.g. Perodua">
+          <label>Make (Brand) <span style="color:red">*</span></label>
+          <input type="text" name="make" required placeholder="e.g. Perodua">
         </div>
         <div class="form-group" style="margin:0;">
-          <label>Model</label>
-          <input type="text" name="model" placeholder="e.g. Myvi">
+          <label>Model <span style="color:red">*</span></label>
+          <input type="text" name="model" required placeholder="e.g. Myvi">
         </div>
         <div class="form-group" style="margin:0;">
-          <label>Year</label>
-          <input type="number" name="year" placeholder="e.g. 2020" min="1990" max="2030">
+          <label>Year <span style="color:red">*</span></label>
+          <input type="number" name="year" required placeholder="e.g. 2020" min="1990" max="2030">
         </div>
         <div class="form-group" style="margin:0;">
-          <label>Colour</label>
-          <input type="text" name="colour" placeholder="e.g. Silver">
+          <label>Colour <span style="color:red">*</span></label>
+          <input type="text" name="colour" required placeholder="e.g. Silver">
         </div>
         <div class="form-group" style="margin:0;">
-          <label>Current Mileage (km)</label>
-          <input type="number" name="mileage" placeholder="e.g. 45000" min="0">
+          <label>Current Mileage (km) <span style="color:red">*</span></label>
+          <input type="number" name="mileage" required placeholder="e.g. 45000" min="0">
         </div>
       </div>
 
