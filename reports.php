@@ -195,7 +195,18 @@ include __DIR__ . '/partials/header.php';
 <form method="GET" action="reports.php" class="report-filter-bar">
   <div class="filter-group">
     <label>View By</label>
-    <select name="view" onchange="this.form.submit()">
+    <select name="view" onchange="
+      var f=this.form;
+      // carry current year+month hidden before submit
+      ['year','month'].forEach(function(n){
+        if(!f.querySelector('[name='+n+']')){
+          var h=document.createElement('input');h.type='hidden';h.name=n;
+          h.value=n==='year'?document.getElementById('selYear').value:document.getElementById('selMonth').value;
+          f.appendChild(h);
+        }
+      });
+      f.submit();
+    ">
       <option value="monthly" <?= $viewType==='monthly'?'selected':'' ?>>📅 Monthly</option>
       <option value="yearly"  <?= $viewType==='yearly' ?'selected':'' ?>>📆 Yearly</option>
     </select>
@@ -204,7 +215,7 @@ include __DIR__ . '/partials/header.php';
   <?php if ($viewType === 'monthly'): ?>
   <div class="filter-group">
     <label>Month</label>
-    <select name="month">
+    <select name="month" id="selMonth">
       <?php for ($m=1;$m<=12;$m++): ?>
         <option value="<?= $m ?>" <?= $m===$selMonth?'selected':'' ?>><?= date('F', mktime(0,0,0,$m,1)) ?></option>
       <?php endfor; ?>
@@ -214,8 +225,8 @@ include __DIR__ . '/partials/header.php';
 
   <div class="filter-group">
     <label>Year</label>
-    <select name="year">
-      <?php for ($y=date('Y');$y>=2024;$y--): ?>
+    <select name="year" id="selYear">
+      <?php for ($y=2026;$y>=2025;$y--): ?>
         <option value="<?= $y ?>" <?= $y===$selYear?'selected':'' ?>><?= $y ?></option>
       <?php endfor; ?>
     </select>
