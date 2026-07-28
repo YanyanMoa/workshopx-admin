@@ -61,7 +61,7 @@ include __DIR__ . '/partials/header.php';
           <td><?= htmlspecialchars($u['full_name'] ?? '-') ?></td>
           <td><span class="badge badge-progress"><?= htmlspecialchars(ucfirst($u['role'] ?? 'staff')) ?></span></td>
           <td>
-            <form method="POST" action="users.php" style="display:flex; gap:6px;">
+            <form method="POST" action="users.php" id="form-role-<?= htmlspecialchars($u['id'] ?? '') ?>" style="display:flex; gap:6px;">
               <input type="hidden" name="action" value="update_role">
               <input type="hidden" name="user_id" value="<?= htmlspecialchars($u['id'] ?? '') ?>">
               <select name="role" style="padding:6px;border-radius:6px;border:1px solid #e1e8e8;">
@@ -69,10 +69,10 @@ include __DIR__ . '/partials/header.php';
                   <option value="<?= $r ?>" <?= ($u['role'] ?? '') === $r ? 'selected' : '' ?>><?= ucfirst($r) ?></option>
                 <?php endforeach; ?>
               </select>
-              <button type="submit" class="btn btn-outline btn-sm">Save</button>
             </form>
           </td>
-          <td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="submit" form="form-role-<?= htmlspecialchars($u['id'] ?? '') ?>" class="btn btn-outline btn-sm">Save</button>
             <form method="POST" action="users.php" onsubmit="return confirm('Delete user &quot;<?= htmlspecialchars(addslashes($u['full_name'] ?? '')) ?>&quot;? This cannot be undone.');">
               <input type="hidden" name="action" value="delete_user">
               <input type="hidden" name="user_id" value="<?= htmlspecialchars($u['id'] ?? '') ?>">
@@ -80,6 +80,7 @@ include __DIR__ . '/partials/header.php';
             </form>
           </td>
         </tr>
+
       <?php endforeach; endif; ?>
     </tbody>
   </table>
