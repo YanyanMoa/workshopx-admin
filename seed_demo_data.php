@@ -1,7 +1,8 @@
 <?php
 /**
  * Targeted script to set up perfect demo data for capstone presentation.
- * We have ~16 orders. We will manually distribute them backwards from July 2026.
+ * This distributes the orders realistically across multiple months and statuses
+ * so the Live Queue is filled with different statuses (Pending, In Progress, Awaiting Parts, Completed, Paid, Cancelled).
  */
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/Supabase.php';
@@ -16,39 +17,50 @@ if (empty($orders)) {
     exit;
 }
 
-// We want to force a specific distribution:
-// 8 in July 2026 (mostly Paid)
-// 3 in June 2026 (mostly Paid)
-// 2 in May 2026 (Paid)
-// 2 in April 2026 (Paid)
-// 1 in March 2026 (Paid)
+// 16 orders total. Let's create a perfect status distribution:
+// July 2026 (Live Queue demo month)
+// - 3 Paid (Revenue)
+// - 2 Completed
+// - 2 In Progress
+// - 2 Pending
+// - 1 Awaiting Parts
+// - 1 Cancelled
+//
+// June 2026
+// - 1 Paid (Revenue)
+// - 1 Awaiting Parts
+// - 1 Completed
+//
+// May 2026
+// - 1 Paid (Revenue)
+//
+// April 2026
+// - 1 Paid (Revenue)
 
 $demoPlan = [
-    // July 2026
-    ['date' => '2026-07-25T14:30:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-22T10:15:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-18T16:45:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-15T09:20:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-10T11:00:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-08T13:30:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-05T15:10:00Z', 'status' => 'Paid'],
-    ['date' => '2026-07-28T09:00:00Z', 'status' => 'In Progress'],
-    
+    // July 2026 (Current active queue demo)
+    ['date' => '2026-07-28T09:30:00Z', 'status' => 'Pending'],
+    ['date' => '2026-07-28T10:15:00Z', 'status' => 'In Progress'],
+    ['date' => '2026-07-27T14:45:00Z', 'status' => 'Awaiting Parts'],
+    ['date' => '2026-07-27T11:00:00Z', 'status' => 'Pending'],
+    ['date' => '2026-07-26T16:20:00Z', 'status' => 'In Progress'],
+    ['date' => '2026-07-26T09:00:00Z', 'status' => 'Completed'],
+    ['date' => '2026-07-25T13:30:00Z', 'status' => 'Completed'],
+    ['date' => '2026-07-24T15:10:00Z', 'status' => 'Cancelled'],
+    ['date' => '2026-07-22T10:00:00Z', 'status' => 'Paid'],
+    ['date' => '2026-07-18T14:00:00Z', 'status' => 'Paid'],
+    ['date' => '2026-07-15T09:30:00Z', 'status' => 'Paid'],
+
     // June 2026
-    ['date' => '2026-06-25T10:00:00Z', 'status' => 'Paid'],
-    ['date' => '2026-06-12T14:20:00Z', 'status' => 'Paid'],
-    ['date' => '2026-06-05T11:10:00Z', 'status' => 'Completed'],
-    
+    ['date' => '2026-06-20T11:30:00Z', 'status' => 'Paid'],
+    ['date' => '2026-06-12T14:20:00Z', 'status' => 'Completed'],
+    ['date' => '2026-06-05T10:10:00Z', 'status' => 'Awaiting Parts'],
+
     // May 2026
-    ['date' => '2026-05-20T16:00:00Z', 'status' => 'Paid'],
-    ['date' => '2026-05-08T09:30:00Z', 'status' => 'Paid'],
-    
+    ['date' => '2026-05-15T15:00:00Z', 'status' => 'Paid'],
+
     // April 2026
-    ['date' => '2026-04-22T13:45:00Z', 'status' => 'Paid'],
     ['date' => '2026-04-10T10:20:00Z', 'status' => 'Paid'],
-    
-    // March 2026
-    ['date' => '2026-03-15T15:00:00Z', 'status' => 'Paid'],
 ];
 
 $total = count($orders);
