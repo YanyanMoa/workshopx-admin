@@ -20,6 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } elseif ($_POST['action'] === 'adjust_qty') {
             Supabase::update(TBL_INVENTORY, ['stock' => (int) $_POST['quantity']], ['id' => 'eq.' . $_POST['part_id']], $token);
             $notice = 'Stock quantity updated.';
+        } elseif ($_POST['action'] === 'delete_part') {
+            Supabase::delete(TBL_INVENTORY, ['id' => 'eq.' . $_POST['part_id']], $token);
+            $notice = 'Spare part deleted successfully.';
         }
     } catch (Exception $e) {
         $error = $e->getMessage();
@@ -47,7 +50,7 @@ include __DIR__ . '/partials/header.php';
     <button class="btn btn-primary" onclick="openModal('addPartModal')">+ Add Part</button>
   </div>
   <table class="data-table" id="partsTable">
-    <thead><tr><th>Part Name</th><th>Part Code</th><th>Quantity</th><th>Unit Price (RM)</th><th>Stock Level</th><th>Adjust</th></tr></thead>
+    <thead><tr><th>Part Name</th><th>Part Code</th><th>Quantity</th><th>Unit Price (RM)</th><th>Stock Level</th><th>Adjust</th><th>Actions</th></tr></thead>
     <tbody>
       <?php if (empty($parts)): ?>
         <tr><td colspan="6" class="empty-state">No inventory items found.</td></tr>
@@ -68,6 +71,13 @@ include __DIR__ . '/partials/header.php';
               <input type="hidden" name="part_id" value="<?= htmlspecialchars($p['id'] ?? '') ?>">
               <input type="number" name="quantity" value="<?= $qty ?>" style="width:70px;padding:6px;border-radius:6px;border:1px solid #e1e8e8;">
               <button type="submit" class="btn btn-outline btn-sm">Save</button>
+            </form>
+          </td>
+          <td>
+            <form method="POST" action="inventory.php" onsubmit="return confirm('Delete &quot;<?= htmlspecialchars(addslashes($p['name'] ?? '')) ?>&quot;? This cannot be undone.');">
+              <input type="hidden" name="action" value="delete_part">
+              <input type="hidden" name="part_id" value="<?= htmlspecialchars($p['id'] ?? '') ?>">
+              <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
             </form>
           </td>
         </tr>
