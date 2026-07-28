@@ -17,6 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'mark_
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_invoice') {
+    try {
+        Supabase::delete(TBL_SERVICE_ORDERS, ['id' => 'eq.' . $_POST['invoice_id']], $token);
+        $notice = 'Invoice deleted successfully.';
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+}
+
 try {
     // Select all service orders that are Completed or Paid
     $orders = Supabase::select(TBL_SERVICE_ORDERS, [
@@ -124,7 +133,7 @@ include __DIR__ . '/partials/header.php';
           <td><span class="badge badge-<?= $paid ? 'paid' : 'unpaid' ?>"><?= $paid ? 'Paid' : 'Unpaid' ?></span></td>
           <td><?= htmlspecialchars(isset($inv['issued_at']) ? date('d M Y', strtotime($inv['issued_at'])) : '-') ?></td>
           <td>
-            <div style="display:flex; gap:6px; align-items:center;">
+            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
               <a href="invoice_view.php?id=<?= urlencode($inv['id']) ?>" class="btn btn-outline btn-sm">View / Print</a>
               <?php if (!$paid): ?>
                 <form method="POST" action="invoices.php" style="margin:0;">
@@ -133,6 +142,11 @@ include __DIR__ . '/partials/header.php';
                   <button type="submit" class="btn btn-primary btn-sm">Mark Paid</button>
                 </form>
               <?php endif; ?>
+              <form method="POST" action="invoices.php" style="margin:0;" onsubmit="return confirm('Delete invoice #<?= htmlspecialchars(substr($inv['id'] ?? '', 0, 8)) ?>? This cannot be undone.');">
+                <input type="hidden" name="action" value="delete_invoice">
+                <input type="hidden" name="invoice_id" value="<?= htmlspecialchars($inv['id'] ?? '') ?>">
+                <button type="submit" class="btn btn-sm" style="background:#fee2e2;color:#b91c1c;border:none;cursor:pointer;">Delete</button>
+              </form>
             </div>
           </td>
         </tr>
