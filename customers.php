@@ -8,14 +8,32 @@ $token = current_token();
 $notice = '';
 $error = '';
 
-// Handle Add Customer
+// Handle Add Customer + Vehicle
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_customer') {
     try {
-        Supabase::insert(TBL_CUSTOMERS, [
+        // Step 1: Insert customer
+        $newCustomer = Supabase::insert(TBL_CUSTOMERS, [
             'name'  => trim($_POST['name']),
             'phone' => trim($_POST['phone']),
         ], $token);
-        $notice = 'Customer added successfully.';
+
+        // Step 2: Insert vehicle linked to the new customer
+        $customerId = $newCustomer[0]['id'] ?? null;
+        if ($customerId && !empty(trim($_POST['plate_no']))) {
+            $dropdownLabel = trim($_POST['plate_no']) . ' - ' . trim($_POST['make']) . ' ' . trim($_POST['model']);
+            Supabase::insert(TBL_VEHICLES, [
+                'customer_id'    => $customerId,
+                'plate_no'       => strtoupper(trim($_POST['plate_no'])),
+                'make'           => trim($_POST['make']),
+                'model'          => trim($_POST['model']),
+                'year'           => (int) $_POST['year'],
+                'colour'         => trim($_POST['colour']),
+                'mileage'        => (int) $_POST['mileage'],
+                'dropdown_label' => $dropdownLabel,
+            ], $token);
+        }
+
+        $notice = 'Customer and vehicle registered successfully.';
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -72,17 +90,14 @@ foreach ($vehicles as $v) {
     }
 }
 
-// Convert map to simple list
 $customers = array_values($customersMap);
-
-// Sort by created_at desc
 usort($customers, function($a, $b) {
     $t1 = isset($a['created_at']) ? strtotime($a['created_at']) : 0;
     $t2 = isset($b['created_at']) ? strtotime($b['created_at']) : 0;
     return $t2 - $t1;
 });
 
-$pageTitle = 'Customers & Vehicles';
+$pageTitle    = 'Customers & Vehicles';
 $pageSubtitle = 'Manage customer profiles and vehicle history';
 include __DIR__ . '/partials/header.php';
 ?>
@@ -123,17 +138,58 @@ include __DIR__ . '/partials/header.php';
   </table>
 </div>
 
-<!-- Add Customer Modal -->
+<!-- Add Customer + Vehicle Modal -->
 <div class="modal-overlay" id="addCustomerModal">
-  <div class="modal-box">
-    <h3>Add New Customer</h3>
+  <div class="modal-box" style="max-width:560px;">
+    <h3>Register New Customer &amp; Vehicle</h3>
     <form method="POST" action="customers.php">
       <input type="hidden" name="action" value="add_customer">
-      <div class="form-group"><label>Full Name</label><input type="text" name="name" required placeholder="e.g. Ahmad Razak"></div>
-      <div class="form-group"><label>Phone Number</label><input type="text" name="phone" required placeholder="e.g. 012-3456789"></div>
-      <div class="modal-actions">
+
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;">Customer Information</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group" style="margin:0;">
+          <label>Full Name <span style="color:red">*</span></label>
+          <input type="text" name="name" required placeholder="e.g. Ahmad Razak">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Phone Number <span style="color:red">*</span></label>
+          <input type="text" name="phone" required placeholder="e.g. 012-3456789">
+        </div>
+      </div>
+
+      <hr style="margin:20px 0;border-color:#eee;">
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px;">Vehicle Information <span style="font-size:11px;">(optional — leave Plate No blank to skip)</span></p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group" style="margin:0;">
+          <label>Plate No</label>
+          <input type="text" name="plate_no" placeholder="e.g. WXY 1234" style="text-transform:uppercase;">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Make (Brand)</label>
+          <input type="text" name="make" placeholder="e.g. Perodua">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Model</label>
+          <input type="text" name="model" placeholder="e.g. Myvi">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Year</label>
+          <input type="number" name="year" placeholder="e.g. 2020" min="1990" max="2030">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Colour</label>
+          <input type="text" name="colour" placeholder="e.g. Silver">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Current Mileage (km)</label>
+          <input type="number" name="mileage" placeholder="e.g. 45000" min="0">
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:24px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('addCustomerModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Customer</button>
+        <button type="submit" class="btn btn-primary">Save Customer &amp; Vehicle</button>
       </div>
     </form>
   </div>
