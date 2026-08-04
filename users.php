@@ -52,12 +52,16 @@ include __DIR__ . '/partials/header.php';
 <div class="table-card">
   <div class="table-toolbar"><input type="text" id="searchUsers" placeholder="🔍 Search users..."></div>
   <table class="data-table" id="usersTable">
-    <thead><tr><th>Full Name</th><th>Current Role</th><th>Change Role</th><th>Actions</th></tr></thead>
+    <thead><tr><th>#</th><th>Full Name</th><th>Current Role</th><th>Change Role</th><th>Actions</th></tr></thead>
     <tbody>
       <?php if (empty($users)): ?>
-        <tr><td colspan="4" class="empty-state">No users found.</td></tr>
-      <?php else: foreach ($users as $u): ?>
+        <tr><td colspan="5" class="empty-state">No users found.</td></tr>
+      <?php else: 
+        $idx = 1;
+        foreach ($users as $u): 
+      ?>
         <tr>
+          <td><?= $idx++ ?></td>
           <td><?= htmlspecialchars($u['full_name'] ?? '-') ?></td>
           <td><span class="badge badge-progress"><?= htmlspecialchars(ucfirst($u['role'] ?? 'staff')) ?></span></td>
           <td>
